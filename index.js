@@ -40,6 +40,27 @@ const hash = shortid.generate()
 
 });
 
+app.get("/littleone/:hash",(req,res)=>{
+   
+    async function redirect() {
+
+    // to verify url needed exist or not
+    const url = await Url.findOne({ hash: req.params.hash });
+    if (!url) { return res.status(404).send("NOT FOUND") };
+
+    const data = ({ url});
+    
+            try {
+                res.redirect(302, url.name);
+              } catch (err) {
+                console.error('Error occurred:', err);
+              }
+    
+    }
+    redirect();
+
+});
+
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
