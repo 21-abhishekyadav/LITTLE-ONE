@@ -23,6 +23,7 @@ const hash = shortid.generate()
         const url = new Url({
             name : req.body.name,
             hash : hash,
+            count : 3,
             
         });
         try {
@@ -45,14 +46,27 @@ app.get("/littleone/:hash",(req,res)=>{
     async function redirect() {
 
     // to verify url needed exist or not
-    const url = await Url.findOne({ hash: req.params.hash });
+    var url = await Url.findOne({ hash: req.params.hash });
     if (!url) { return res.status(404).send("NOT FOUND") };
+    const count = url.count;
 
-    const data = ({ url});
-    
-            try {
-                res.redirect(302, url.name);
-              } catch (err) {
+    if (count <= 0){
+        url = await Url.findByIdAndDelete(url._id);
+        res.json("link expired generate a new one");
+        return;
+    }
+
+    try{
+        url = await Url.findByIdAndUpdate(
+            url._id, // The ID of the document to update
+            { count: count-1 }, // The field to update
+            { new: true } // Return the updated document
+          );
+
+          res.redirect(301, url.name);
+    }
+
+            catch (err) {
                 console.error('Error occurred:', err);
               }
     

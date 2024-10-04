@@ -8,6 +8,10 @@ const Urlschema = new mongoose.Schema({
     hash: {
         type: String,
         required: true
+    },
+    count : {
+        type: Number,
+        required: true,
     }
 })
 const Url = mongoose.model('Url', Urlschema);
