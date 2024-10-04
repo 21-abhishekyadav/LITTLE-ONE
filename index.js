@@ -2,6 +2,7 @@ const connectToMongo=require('./db');
 const express = require('express');
 const Url = require("./data");
 var cors = require('cors')
+const shortid = require('shortid')
 
 
 connectToMongo();
@@ -15,18 +16,19 @@ app.post("/",(req,res)=>{
    
     async function saveurl() {
 
-        //to create ans save hash of a pswd instead of plain text
-        // const salt = await bcrypt.genSalt(10);
-        // const secPass = await bcrypt.hash(req.body.password, salt);
+// generate a short id (hash for url)
+const hash = shortid.generate()
 
-
+// save the url and hash in db in given format
         const url = new Url({
             name : req.body.name,
+            hash : hash,
             
         });
         try {
             const Url = await url.save();
-            const data = ({ url: { urlname: url.name } });
+            const out = "/littleone/"+url.hash;
+            const data = ({ url: out});
             res.json({ data });
         }
         catch (err) {
@@ -37,6 +39,7 @@ app.post("/",(req,res)=>{
 
 
 });
+
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
